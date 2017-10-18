@@ -22,9 +22,6 @@ const getUrl = url => {
 	
 }
 
-// getUrl('https://www.youtube.com/watch?v=qRNB8CV3_LU')
-// 	.then(console.log)
-
 var express = require('express');
 var app = express();
 
@@ -32,7 +29,7 @@ app.get('/youtube/:watchId', function (req, res) {
 	const watchId = req.params.watchId;
 	getUrl(`https://www.youtube.com/watch?v=${watchId}`)
 		.then(downloadUrl => {
-			res.send(downloadUrl);
+			res.json({downloadUrl});
 		});
 });
 
