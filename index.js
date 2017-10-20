@@ -28,12 +28,30 @@ const getUrl = url => {
 const express = require('express');
 const app = express();
 
+const cache = {};
+const timeoutTime = 3600 * 1000; // 1 hour
+const getCache = id => {
+	const cached = cache[id];
+	if (cached) {
+		if (new Date() - cached.time > timeoutTime) {
+			return null;
+		}
+	}
+	return cached;
+}
+
 app.get('/youtube/:watchId', function (req, res) {
 	const watchId = req.params.watchId;
-	getUrl(`https://www.youtube.com/watch?v=${watchId}`)
-		.then(downloadUrl => {
-			res.json({downloadUrl});
+	const cached = getCache(watchId);
+	if (!cached) {
+		getUrl(`https://www.youtube.com/watch?v=${watchId}`)
+			.then(downloadUrl => {
+				cache[watchId] = {downloadUrl, time: new Date()};
+				res.json({downloadUrl});
 		});
+	} else {
+		res.json({downloadUrl:cached.downloadUrl});
+	}
 });
 
 
